@@ -51,6 +51,9 @@ static uint8_t nodeResetFlag = false;	/* Flag to indicate whether S2w Node has r
 static uint8_t tcpClientCid = HOST_APP_INVALID_CID;	/* TCP client CID */
 static uint8_t udpClientCid = HOST_APP_INVALID_CID;	/* UDP client CID */
 
+#define CID_INT_TO_HEX(cidInt) (cidIntToHex[cidInt]) ///< Converts integer value to hex ascii character
+static const char cidIntToHex[17] = "0123456789ABCDEF"; ///< Lookup table for integer to hex ascii conversion
+
 /*-------------------------------------------------------------------------*
  * Function Prototypes:
  *-------------------------------------------------------------------------*/
@@ -1257,7 +1260,7 @@ AtLibGs_Close (uint8_t cid)
   HOST_APP_MSG_ID_E rxMsgId;
 
   /* Construct the AT command */
-  sprintf (G_ATCmdBuf, "AT+NCLOSE=%c\r\n", cid);
+  sprintf (G_ATCmdBuf, "AT+NCLOSE=%c\r\n", CID_INT_TO_HEX(cid));
 
   /* Send command to S2w App node */
   rxMsgId = AtLib_CommandSend ();
@@ -2599,7 +2602,7 @@ AtLib_SendTcpData (uint8_t cid, const uint8_t * txBuf, uint32_t dataLen)
     {
       HOST_APP_MSG_ID_E rxMsgId;
       /* Construct the data start indication message */
-      sprintf (G_ATCmdBuf, "%c%c%c", HOST_APP_ESC_CHAR, 'S', cid);
+      sprintf (G_ATCmdBuf, "%c%c%c", HOST_APP_ESC_CHAR, 'S', CID_INT_TO_HEX(cid));
 
       /* Now send the data START indication message  to S2w node */ GS_HAL_send (
 										(uint8_t *) & G_ATCmdBuf[0], 3);
@@ -2668,12 +2671,12 @@ AtLib_SendUdpData (uint8_t cid, const uint8_t * txBuf, uint32_t dataLen,
 	{
 	  /* <ESC> < U>  <cid> <ip address><:> <port numer><:> <data> <ESC> < E> */
 	  sprintf (G_ATCmdBuf, "%c%c%c%s:" _F16_ ":", HOST_APP_ESC_CHAR, 'U',
-		   cid, pUdpClientIP, udpClientPort);
+		   CID_INT_TO_HEX(cid), pUdpClientIP, udpClientPort);
 	}
       else
 	{
 	  /* <ESC> < S>  <cid>  <data> <ESC> < E> */
-	  sprintf (G_ATCmdBuf, "%c%c%c", HOST_APP_ESC_CHAR, 'S', cid);
+	  sprintf (G_ATCmdBuf, "%c%c%c", HOST_APP_ESC_CHAR, 'S', CID_INT_TO_HEX(cid));
 	}
 
       /* Now send the data START indication message  to S2w node */ GS_HAL_send (
@@ -2718,7 +2721,7 @@ AtLib_BulkDataTransfer (uint8_t cid, const uint8_t * pData, uint32_t dataLen)
 
   /* Construct the bulk data start indication message  */
   AtLib_ConvertNumberTo4DigitASCII (dataLen, digits);
-  sprintf (&(G_ATCmdBuf[0]), "%c%c%c%s", HOST_APP_ESC_CHAR, 'Z', cid, digits);
+  sprintf (&(G_ATCmdBuf[0]), "%c%c%c%s", HOST_APP_ESC_CHAR, 'Z', CID_INT_TO_HEX(cid), digits);
 
   /* Now send the bulk data START indication message  to S2w node */
   GS_HAL_send ((uint8_t *) & G_ATCmdBuf[0], strlen (G_ATCmdBuf));
@@ -2770,7 +2773,7 @@ AtLib_UdpServerBulkDataTransfer (uint8_t cid, char *ipAddress, char *port,
 
   /* Construct the bulk data start indication message  */
   AtLib_ConvertNumberTo4DigitASCII (dataLen, digits);
-  sprintf (&(G_ATCmdBuf[0]), "%c%c%c%s:%s:%s", HOST_APP_ESC_CHAR, 'Y', cid,
+  sprintf (&(G_ATCmdBuf[0]), "%c%c%c%s:%s:%s", HOST_APP_ESC_CHAR, 'Y', CID_INT_TO_HEX(cid),
 	   ipAddress, port, digits);
 
   /* Now send the bulk data START indication message  to S2w node */

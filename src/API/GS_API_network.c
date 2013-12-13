@@ -21,11 +21,8 @@
 
 #define CID_COUNT 16 ///< Number of possible connection IDs
 
-/** Private Macros **/
-#define CID_INT_TO_HEX(cidInt) (cidIntToHex[cidInt]) ///< Converts integer value to hex ascii character
 
 /** Private Variables **/
-static const char cidIntToHex[17] = "0123456789ABCDEF"; ///< Lookup table for integer to hex ascii conversion
 static HOST_APP_NETWORK_CONFIG_T apiNetworkConfig; ///< Network configuration structure for default network
 static GS_API_DataHandler cidDataHandlers[CID_COUNT]; ///< Array of function pointers for CID data handlers
 static char tcpServerClientIp[IP_STRING_LENGTH]; ///< IP address of incoming TCP server client connection
@@ -292,11 +289,11 @@ uint8_t GS_API_CreateTcpClientConnection(char* serverIp, char* serverPort, GS_AP
 }
 
 bool GS_API_SendUdpClientData(uint8_t cid, uint8_t* dataBuffer, uint16_t dataLength){
-     return AtLib_BulkDataTransfer(CID_INT_TO_HEX(cid), dataBuffer, dataLength) == HOST_APP_MSG_ID_ESC_CMD_OK;
+     return AtLib_BulkDataTransfer(cid, dataBuffer, dataLength) == HOST_APP_MSG_ID_ESC_CMD_OK;
 }
 
 bool GS_API_SendTcpData(uint8_t cid, uint8_t* dataBuffer, uint16_t dataLength){
-     return AtLib_BulkDataTransfer(CID_INT_TO_HEX(cid), dataBuffer, dataLength) == HOST_APP_MSG_ID_ESC_CMD_OK;
+     return AtLib_BulkDataTransfer(cid, dataBuffer, dataLength) == HOST_APP_MSG_ID_ESC_CMD_OK;
 }
 
 bool GS_API_SendUdpServerDataToLastClient(uint8_t cid, uint8_t* dataBuffer, uint16_t dataLength){
@@ -312,7 +309,7 @@ bool GS_API_SendUdpServerDataToLastClient(uint8_t cid, uint8_t* dataBuffer, uint
 
 
 void GS_API_CloseConnection(uint8_t cid){
-     AtLibGs_Close(CID_INT_TO_HEX(cid));
+     AtLibGs_Close(cid);
      cidDataHandlers[cid] = NULL;
 }
 
