@@ -163,6 +163,7 @@ typedef enum {
 HOST_APP_MSG_ID_E AtLib_CommandSend(void);
 HOST_APP_MSG_ID_E AtLibGs_Check(void);
 HOST_APP_MSG_ID_E AtLibGs_SetEcho(uint8_t mode);
+HOST_APP_MSG_ID_E AtLibGs_SetSoftwareFlowControl(uint8_t mode);
 HOST_APP_MSG_ID_E AtLibGs_MACSet(int8_t *pAddr);
 HOST_APP_MSG_ID_E AtLibGs_CalcNStorePSK(int8_t *pSsid, int8_t *pPsk);
 HOST_APP_MSG_ID_E AtLibGs_WlanConnStat(void);

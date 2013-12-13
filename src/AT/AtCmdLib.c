@@ -401,6 +401,32 @@ AtLibGs_SetEcho (uint8_t mode)
 }
 
 /*---------------------------------------------------------------------------*
+ * Routine:  AtLibGs_SetSoftwareFlowControl
+ *---------------------------------------------------------------------------*
+ * Description:
+ *      Send command to turn on or off software flow control
+ *          AT&K<0|1>
+ *      and wait for response.
+ * Inputs:
+ *      uint8_t mode -- 1=to turn on, 0=to turn off
+ * Outputs:
+ *      HOST_APP_MSG_ID_E -- response type
+ *---------------------------------------------------------------------------*/
+HOST_APP_MSG_ID_E
+AtLibGs_SetSoftwareFlowControl (uint8_t mode)
+{
+  HOST_APP_MSG_ID_E rxMsgId;
+
+  /* Construct the AT command */
+  sprintf (G_ATCmdBuf, "AT&K" _F8_ "\r\n", mode);
+
+  /* Send command to S2w App node */
+  rxMsgId = AtLib_CommandSend ();
+
+  return rxMsgId;
+}
+
+/*---------------------------------------------------------------------------*
  * Routine:  AtLibGs_MACSet
  *---------------------------------------------------------------------------*
  * Description:
