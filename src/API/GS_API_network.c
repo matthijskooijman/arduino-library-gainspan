@@ -17,6 +17,7 @@
 #define DEFAULT_SSID        "GS_NETWORK" ///< Default SSID if not stored in non-volatile storage
 #define DEFAULT_CHANNEL     "0" ///< Default channel if not stored in non-volatile storage
 #define DEFAULT_SECURITY    "0" ///< Default security mode if not stored in non-volatile storage
+#define DEFAULT_PASSPHRASE  "" ///< Default passphrase if not stored in non-volatile storage
 #define DEFAULT_DHCP_ENABLE "1" ///< Default dhcp mode if not stored in non-volatile storage
 
 #define CID_COUNT 16 ///< Number of possible connection IDs
@@ -394,6 +395,8 @@ void gs_api_readNetworkConfig(void) {
                  sizeof(DEFAULT_DHCP_ENABLE));
           memcpy(apiNetworkConfig.security, DEFAULT_SECURITY,
                  sizeof(DEFAULT_SECURITY));
+          memcpy(apiNetworkConfig.passphrase, DEFAULT_PASSPHRASE,
+                 sizeof(DEFAULT_PASSPHRASE));
      }
 }
 

@@ -240,6 +240,9 @@ HOST_APP_MSG_ID_E AtLibGs_SetAuthMode(int8_t authMode);
 HOST_APP_MSG_ID_E AtLibGs_SetSecurity(int8_t secMode);
 void AtLibGs_StartFirmwareUpdate(HOST_APP_FWUPDATE_MODE_E fwupMode);
 HOST_APP_MSG_ID_E AtLibGs_Reset(void);
+HOST_APP_MSG_ID_E AtLibGs_AddCert (const char* name, bool to_flash, const uint8_t *buf, uint16_t len);
+HOST_APP_MSG_ID_E AtLibGs_DelCert (const char* name);
+HOST_APP_MSG_ID_E AtLibGs_DoTls(uint8_t cid, const char* cacert, const char* client_cert, const char *client_key);
 
 
 uint8_t AtLib_ParseTcpClientCid(void);

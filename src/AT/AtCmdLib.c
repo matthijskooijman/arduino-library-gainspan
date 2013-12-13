@@ -1991,6 +1991,127 @@ AtLibGs_Reset (void)
 }
 
 /*---------------------------------------------------------------------------*
+ * Routine:  AtLibGs_AddCert
+ *---------------------------------------------------------------------------*
+ * Description:
+ *      Adds a TLS/SSL certificate
+ * Inputs:
+ *      const char* name -- Name to store the certificate under
+ *      bool to_flash -- If true, certificate will be stored in flash
+ *                       instead of ram.
+ *      const uint8_t *buf -- Certificate contents in (binary) DER
+ *                            format.
+ *      uint16_t len -- Length of the data in buf.
+ * Outputs:
+ *      HOST_APP_MSG_ID_E -- response type
+ *---------------------------------------------------------------------------*/
+HOST_APP_MSG_ID_E
+AtLibGs_AddCert (const char* name, bool to_flash, const uint8_t *buf, uint16_t len)
+{
+  HOST_APP_MSG_ID_E rxMsgId;
+
+  /* Construct the AT command */
+  sprintf (G_ATCmdBuf, "AT+TCERTADD=%s,0," _F16_ "," _F8_ "\r\n", name, len, !to_flash);
+
+  /* Send command to S2w App node */
+  rxMsgId = AtLib_CommandSend ();
+
+  GS_API_Printf("RES: %d", rxMsgId);
+  if (rxMsgId == HOST_APP_MSG_ID_OK) {
+    const uint8_t escape[] = {0x1b, 'W'};
+    AtLib_DataSend (escape, sizeof(escape));
+    AtLib_DataSend (buf, len);
+
+    rxMsgId = AtLib_ResponseHandle ();
+  }
+
+  return rxMsgId;
+}
+
+/*---------------------------------------------------------------------------*
+ * Routine:  AtLibGs_DelCert
+ *---------------------------------------------------------------------------*
+ * Description:
+ *      Delete a TLS/SSL certificate
+ * Inputs:
+ *      const char* name -- Name of the certificate to delete
+ * Outputs:
+ *      HOST_APP_MSG_ID_E -- response type
+ *---------------------------------------------------------------------------*/
+HOST_APP_MSG_ID_E
+AtLibGs_DelCert (const char* name)
+{
+  HOST_APP_MSG_ID_E rxMsgId;
+
+  /* Construct the AT command */
+  sprintf (G_ATCmdBuf, "AT+TCERTDEL=%s\r\n", name);
+
+  /* Send command to S2w App node */
+  rxMsgId = AtLib_CommandSend ();
+
+  return rxMsgId;
+}
+
+/*---------------------------------------------------------------------------*
+ * Routine:  AtLibGs_DoTls
+ *---------------------------------------------------------------------------*
+ * Description:
+ * Perform TLS handshaking. Should be called after a connection is
+ * opened, but before any data is sent. After this, all data sent will
+ * be encrypted.
+ *
+ * The certname is the name of a certificate previously set through
+ * AddCert. The certificate should be a CA certificate. If the server
+ * supplies a certificate that is signed by this particular CA, then
+ * the TLS handshake succeeds. If the server certificate is not signed
+ * by this CA (or is invalid for other reasons, like expiry date), the
+ * connection is closed and 0 is returned.
+ *
+ * If NULL or the empty string is passed for cacert, no checking of the
+ * server certificate happens.
+ *
+ * Note that no checking of the server certificate's commonName
+ * happens! If you pass in a (commercial) CA certificate, _any_
+ * certificate issued by that CA will be accepted, not just the ones
+ * with a specific hostname inside.
+ *
+ * Also make sure that the current time is correctly set, otherwise
+ * the server certificate will likely be considered expired or not yet
+ * valid even when it isn't.
+ *
+ * client_cert and client_key can be left (NULL or empty string) when no
+ * client authentication is required, but when using client
+ * authentication, all three of cacert, client_cert and client_key
+ * should be passed.
+ *
+ * Inputs:
+ *      uint8_t cid -- CID of the connection
+ *      const char* cacert -- Name of the ca certificate
+ *      const char* client_cert -- Name of the client certificate
+ *      const char* client_key -- Name of the client key
+ * Outputs:
+ *      HOST_APP_MSG_ID_E -- response type
+ *---------------------------------------------------------------------------*/
+HOST_APP_MSG_ID_E
+AtLibGs_DoTls(uint8_t cid, const char* cacert, const char* client_cert, const char *client_key)
+{
+  HOST_APP_MSG_ID_E rxMsgId;
+
+  /* Construct the AT command. The module doesn't like empty client
+   * cert/key names, so we only include those if they're actually set.
+   * An empty cacert at the end is ok, though */
+  if (client_cert || client_key)
+    sprintf (G_ATCmdBuf, "AT+SSLOPEN=%c,%s,%s,%s\r\n", CID_INT_TO_HEX(cid), cacert, client_cert, client_key);
+  else
+    sprintf (G_ATCmdBuf, "AT+SSLOPEN=%c,%s\r\n", CID_INT_TO_HEX(cid), (cacert?:""));
+
+  /* Send command to S2w App node */
+  rxMsgId = AtLib_CommandSend ();
+
+  return rxMsgId;
+}
+
+/*---------------------------------------------------------------------------*
  * Routine:  AtLib_ParseTcpClientCid
  *---------------------------------------------------------------------------*
  * Description:
