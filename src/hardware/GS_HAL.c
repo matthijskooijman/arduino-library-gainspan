@@ -14,7 +14,7 @@ void GS_HAL_init(void){
 #endif
   
 #ifdef GS_HAL_USE_UART
-  GS_HAL_uart_set_comm_port(9600);
+  GS_HAL_uart_set_comm_port(115200);
 #endif      
  
   MSTimerInit();

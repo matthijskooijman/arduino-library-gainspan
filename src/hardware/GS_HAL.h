@@ -10,6 +10,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define GS_HAL_USE_UART
+
 #ifdef GS_HAL_USE_SPI
   #ifdef GS_HAL_USE_UART
     #error Only one of GS_HAL_USE_SPI or GS_HAL_USE_UART should be defined
