@@ -2786,7 +2786,7 @@ AtLib_UdpServerBulkDataTransfer (uint8_t cid, char *ipAddress, char *port,
 uint8_t
 AtLib_getCidFromAscii (uint8_t cidAscii)
 {
-  uint8_t cid = HOST_APP_INVALID_CID;
+  unsigned int cid = HOST_APP_INVALID_CID;
   uint8_t cidStr[] = " ";
   cidStr[0] = cidAscii;
 
